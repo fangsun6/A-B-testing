@@ -1,138 +1,146 @@
 
 # 📊 A/B Testing & Hash-Based Routing in Python
 
-This repository contains two key Python projects:
+This repository documents two Python-based data science workflows:
 
 1. **A/B Testing on Game Design** — measuring the impact of in-game gate placement on user retention.
-2. **Hash-Based Routing System** — a backend-friendly method for assigning users to A/B/C groups in a deterministic and fair way.
+2. **Hash-Based Routing System** — a backend-friendly method for assigning users to A/B/C groups in a deterministic and scalable way.
 
 ---
 
-## 🧪 Part 1: A/B Testing Analysis - Cookie Cats Game
+## 🧪 Part 1: A/B Testing Analysis – Cookie Cats Game
 
 **File**: `AB_Testing_Converted.py`
 
-### 🎮 Context & Objective
+### 🎮 Problem Context
 
-In mobile games, balancing monetization and user experience is critical. *Cookie Cats* uses “gates” at certain levels to encourage in-app purchases or impose waiting time. The hypothesis here is: _Does moving the first gate from level 30 to level 40 affect player retention?_
+In mobile gaming, developers often use "gates"—points where players must wait or pay—to control pacing. The business question was:
 
-We aim to evaluate this with a full-cycle A/B testing workflow.
+> _Will delaying the first gate from level 30 to level 40 improve player retention?_
 
----
-
-### 🧠 Analytical Thoughts
-
-- **Retention is critical**: Early player engagement (Day-1 and Day-7 retention) often predicts long-term success.
-- **Gate timing might frustrate or retain**: A gate too early could repel users; too late may reduce monetization opportunities.
+This question inspired a well-designed A/B test.
 
 ---
 
-### 🛠️ Workflow Overview
+### 🔍 Thought Process
 
-1. **Data Collection**:
-   - Pulled data from Google Drive using `gdown`.
-   - Dataset includes: `user_id`, `version` (A or B), `sum_gamerounds`, `retention_1`, `retention_7`.
-
-2. **Data Cleaning**:
-   - Checked for zero-play users.
-   - Removed extreme outliers (max game rounds).
-
-3. **Exploratory Data Analysis**:
-   - Used histograms, boxplots, ECDF plots, and bar charts to visualize group differences.
-   - Customized fonts for Chinese visualization (TaipeiSans).
-
-4. **Statistical Testing**:
-   - Shapiro-Wilk test → Most data was non-normal.
-   - Used Levene’s test to check variance equality.
-   - Employed t-tests or Mann-Whitney U where appropriate.
-
-5. **Bootstrap**:
-   - Used resampling to estimate confidence intervals for retention metrics.
+- **Formulate Hypothesis**: If players encounter the gate later, they will be more engaged and more likely to return.
+- **Design Metrics**: Focused on Day-1 and Day-7 retention, and total game rounds played.
+- **Choose Tools**: Used Python libraries such as `pandas`, `matplotlib`, `scipy`, and `statsmodels`.
 
 ---
 
-### 🧩 Key Difficulties & Solutions
+### 🧭 Step-by-Step Reasoning
 
-| Problem | Approach |
-|--------|----------|
-| **Non-normal data** | Used non-parametric tests (Mann-Whitney U) |
-| **Skewed game rounds** | Removed extreme outliers (>99th percentile) |
-| **Retention is binary** | Focused on proportions and bootstrap analysis |
-| **User behavior is noisy** | Aggregated large sample (90K+ users) to ensure robustness |
-| **Conflicting visual vs. statistical results** | Relied on statistical inference for rigor |
+1. **📥 Data Collection**
+   - Used `gdown` to access a large public dataset of ~90,000 users.
+   - Loaded data into a Pandas DataFrame and explored the schema.
+
+2. **🧹 Data Cleaning**
+   - Identified and removed users with 0 rounds played.
+   - Detected and excluded extreme outliers using the 99th percentile.
+
+3. **📊 EDA (Exploratory Data Analysis)**
+   - Plotted histograms and ECDFs to compare engagement between gate_30 and gate_40.
+   - Observed skewed data distributions, suggesting non-normality.
+
+4. **🧪 Statistical Testing**
+   - **Normality Test**: Shapiro-Wilk showed most variables were not normally distributed.
+   - **Variance Check**: Used Levene’s test to verify assumptions.
+   - **Choice of Test**: Employed Mann-Whitney U test over t-test due to skewed data.
+
+5. **🔁 Bootstrap Inference**
+   - Implemented bootstrap resampling to estimate confidence intervals of retention rates.
+   - This non-parametric approach gave additional robustness.
+
+6. **📈 Interpretation**
+   - Visuals indicated a slight retention drop with gate_40.
+   - Statistical tests confirmed that the drop was significant.
 
 ---
 
-### ✅ Outcome
+### 🧩 What Was Hard & How I Solved It
 
-- The change **negatively affected Day-1 retention** (statistically significant).
-- Recommendation: **Keep the gate at level 30** to maintain early user engagement.
-- Illustrated the importance of data-driven game design decisions.
+| Challenge | Thought Path & Solution |
+|----------|--------------------------|
+| Non-normal retention data | Switched to non-parametric Mann-Whitney U test |
+| Binary outcome variable | Used proportions and bootstrap rather than relying solely on t-tests |
+| Interpretation ambiguity | Combined visual (boxplots, histograms) with statistical rigor |
+| User churn noise | Aggregated behavior over tens of thousands of users to reduce variance |
+| Language support (Chinese fonts) | Embedded custom fonts into Matplotlib for proper visualization |
 
 ---
 
-## 🔀 Part 2: Hash-Based Routing
+### ✅ Key Takeaways
+
+- **Data volume helps but doesn’t guarantee clarity**—visuals and tests must work together.
+- **Statistical testing is nuanced**—normality and variance assumptions matter.
+- **Bootstrap is powerful**—great for inferring metrics from real-world data.
+
+---
+
+## 🔀 Part 2: Hash-Based Routing System
 
 **File**: `hash_routing_cleaned.py`
 
-### 🎯 Purpose
+### 🎯 Goal
 
-In A/B testing, you need a consistent and fair way to assign users into groups (A/B/C). Storing these assignments in a database adds overhead. Instead, we use **hash functions** to assign users **deterministically**.
-
----
-
-### 💡 Concept
-
-Using a hash function (`mmh3`) on user IDs ensures:
-- **Consistency**: Same user always gets the same group.
-- **Fairness**: Groups can be balanced by percentage allocation (50% A, 25% B, 25% C).
-- **Statelessness**: No need to persist the assignment in a DB.
+Create a **stateless**, **fair**, and **consistent** method to assign users to experimental groups (A/B/C) without storing their IDs in a database.
 
 ---
 
-### 📈 Analysis Process
+### 🧠 Design Thinking
 
-1. **Generate 10,000 random user IDs**.
-2. **Hash each ID** using `mmh3` and reduce `mod 100`.
-3. **Assign to groups** based on pre-defined ranges:
-   - A: 0–49
-   - B: 50–74
-   - C: 75–99
-
-4. **Run Chi-Square test** to compare actual vs expected ratios.
+- Used MurmurHash3 (`mmh3`) because it’s fast, widely used in production, and has good randomness properties.
+- Avoided modulo bias by applying `hash(user_id) % 100` with carefully split intervals:
+  - A: 0–49
+  - B: 50–74
+  - C: 75–99
 
 ---
 
-### 🧩 Challenges & Mitigation
+### 🔬 Verification Steps
 
-| Challenge | Strategy |
-|----------|----------|
-| **Biased hash function** | Used `mmh3`, a high-quality, fast hash function |
-| **Imbalanced sample** | Tested over large random samples to check distribution |
-| **Reproducibility** | `mmh3` provides consistent hashing across runs |
-| **User tracking without storage** | Solved by deterministic hashing instead of DB mapping |
-
----
-
-### 📊 Output
-
-- Pie chart visualization confirms near-equal proportions.
-- Chi-square test confirms **no statistically significant difference** from expected group sizes.
+1. **Simulated 10,000 random user IDs**
+2. **Applied hash bucketing logic**
+3. **Counted group assignment frequencies**
+4. **Ran Chi-squared test** to validate statistical fairness
+5. **Visualized distribution** using a pie chart
 
 ---
 
-## 📁 File Structure
+### 🧩 Challenges & Insights
+
+| Challenge | Thought Path & Resolution |
+|----------|---------------------------|
+| How to ensure group balance? | Used Chi-square test against expected group proportions |
+| What if the hash is biased? | Verified `mmh3` empirically over large random ID sets |
+| Can we guarantee consistency? | Yes, same input → same hash → same group |
+| Avoiding DB writes? | Stateless logic based on hash eliminates storage needs |
+
+---
+
+### 📉 Real-World Applications
+
+- Feature flag rollouts
+- Online experiments (A/B/n tests)
+- Load balancing users across versions
+- Personalization buckets
+
+---
+
+## 📁 Project Structure
 
 ```
 .
-├── AB_Testing_Converted.py     # Complete A/B testing notebook with plots and analysis
-├── hash_routing_cleaned.py     # Script for hash-based deterministic user bucketing
-└── README.md                   # Project explanation, reasoning, and instructions
+├── AB_Testing_Converted.py     # Full A/B test analysis with stats and visualization
+├── hash_routing_cleaned.py     # Stateless hash-based user bucketing with tests
+└── README.md                   # Project overview, strategy, and reflections
 ```
 
 ---
 
-## 📦 Requirements
+## 📦 Installation
 
 Install dependencies:
 
@@ -142,16 +150,17 @@ pip install pandas numpy matplotlib seaborn scipy statsmodels mmh3
 
 ---
 
-## 💭 Final Thoughts
+## 📚 Final Reflections
 
-Both projects reflect key components of data science:
-- The **A/B test** focuses on experiment design, statistical rigor, and business decision-making.
-- The **hash router** focuses on scalable engineering, fairness, and automation.
+This project integrates **applied statistics** and **practical software design**:
 
-This repo bridges both analysis and deployment concerns in a real-world data-driven workflow.
+- A/B Testing: focuses on **hypothesis-driven experimentation**
+- Hash Routing: focuses on **scalable and reproducible infrastructure**
+
+Together, they demonstrate how data science is not just about models—but about solving real product and engineering problems with statistical rigor and implementation thinking.
 
 ---
 
 ## 📜 License
 
-MIT License. Provided for educational purposes.
+MIT License — use freely with attribution.
