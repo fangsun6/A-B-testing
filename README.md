@@ -18,7 +18,7 @@ We use data from 90,000+ players to explore:
 
 ## 🧾 Dataset
 
-- **Source**: [Google Drive - Public CSV Download](https://drive.google.com/uc?id=1IkN-fylT9ZYxZJhzbgpAmJ751b6lrPy9)
+- **Source**: cookie_cats.csv
 - **Size**: 90,189 observations, 5 columns
 - **Format**: CSV
 
@@ -104,60 +104,8 @@ Understanding player behavior required a careful approach to both data preparati
 | 3.   | Visualized before and after | Plotted histograms and boxplots. |
 | 4.   | Treated zero-round users selectively | Included for retention, excluded from gameplay plots. |
 
----
 
-## 🧪 Before Removing Extreme Values
 
-### 🔍 Raw Player Activity (Line Plot)
-
-![Before Removing The Extreme Value](./before_extreme_line.png)
-
-- Each point represents a player's weekly game rounds.
-- A huge spike in `gate_30` shows one user with nearly 50,000 rounds.
-
-### 📊 Histogram & Boxplot View
-
-![Group Distributions Before Filtering](./before_extreme_hists.png)
-
-- **Left**: Histogram for `gate_30`
-- **Center**: Histogram for `gate_40`
-- **Right**: Boxplot comparison of both groups
-
-These visuals justified filtering outliers before applying statistical tests or comparing means.
-
----
-
-## 🛠 Project Workflow
-
-1. **Load Data & Clean**
-2. **Visualize Engagement**
-3. **Compute Retention**
-4. **Run Tests (Shapiro, Levene, T-tests, Bootstrap)**
-5. **Draw Business Insights**
-
----
-
-## 📈 Visualizations
-
-- Histograms, boxplots, ECDFs
-- Retention comparisons
-- Bootstrap distributions
-
----
-
-## 💡 Key Insights
-
-- Moving the gate to level 40 **decreased retention** slightly.
-- Engagement remained similar across groups.
-- Retention metrics were **statistically different** via bootstrap & tests.
-
----
-
-## 📬 Contact
-
-- 👤 Your Name
-- 📧 your.email@example.com
-- 🔗 [GitHub](https://github.com/yourname)
 
 ## 📊 Visualizing Engagement
 
