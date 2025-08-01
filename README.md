@@ -64,26 +64,8 @@ We use data from 90,000+ players to explore:
 
 ---
 
-## 🧪 Before Removing Extreme Values
+![Uploading Unknown-3.png…]()
 
-### 🔍 Raw Player Activity (Line Plot)
-
-![Before Removing The Extreme Value](./before_extreme_line.png)
-
-- Each point represents a player's weekly game rounds.
-- A huge spike in `gate_30` shows one user with nearly 50,000 rounds.
-
-### 📊 Histogram & Boxplot View
-
-![Group Distributions Before Filtering](./before_extreme_hists.png)
-
-- **Left**: Histogram for `gate_30`
-- **Center**: Histogram for `gate_40`
-- **Right**: Boxplot comparison of both groups
-
-These visuals justified filtering outliers before applying statistical tests or comparing means.
-
----
 
 ## 🛠 Project Workflow
 
