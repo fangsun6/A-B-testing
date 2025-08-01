@@ -1,121 +1,118 @@
 
-# 📊 Cookie Cats A/B Testing Analysis
+# 🎮 A/B Testing: Impact of Gate Level on Player Retention in Cookie Cats
 
-This project analyzes an A/B test conducted on **Cookie Cats**, a mobile puzzle game developed by Tactile Entertainment. The goal is to evaluate how shifting the **first level gate from level 30 to level 40** affects user behavior—specifically player **retention rates** and **game rounds played**.
-
----
-
-## 🎮 Background
-
-**Cookie Cats** is a match-3 style mobile game, similar to other puzzle games like *Candy Crush*. Players progress through levels, but occasionally face "gates"—checkpoints that require waiting or in-game purchases to continue.
-
-To improve the game's retention and engagement, the developers ran an A/B test:
-
-- **Group A (gate_30):** Players face the first gate at level 30 (control group).
-- **Group B (gate_40):** Players face the first gate at level 40 (treatment group).
+This project conducts an A/B test analysis using Python to investigate how the placement of a gate in the mobile game **Cookie Cats** affects player retention and engagement.
 
 ---
 
-## 📌 Objectives
+## 📌 Problem Statement
 
-- Investigate whether changing the gate from level 30 to level 40 improves user **engagement** and **retention**.
-- Use **data analysis**, **visualization**, and **statistical testing** to support decision-making.
+**Cookie Cats**, a puzzle game developed by Tactile Entertainment, includes progression "gates" at certain levels. Players must either wait or pay to advance beyond these gates. The original gate was placed at **level 30**, but the company wanted to test whether moving it to **level 40** would improve retention.
 
----
+We use data from 90,000+ players to explore:
 
-## 📁 Dataset Description
-
-The dataset includes **90,189 players** who installed the game during the A/B test period. Each row represents a player.
-
-| Column           | Description                                                                  |
-|------------------|------------------------------------------------------------------------------|
-| `userid`         | Unique identifier for each player.                                           |
-| `version`        | Group assignment: `gate_30` or `gate_40`.                                   |
-| `sum_gamerounds` | Number of game rounds played in the first 7 days after installation.        |
-| `retention_1`    | 1 if the player logged in the day after installation, else 0.               |
-| `retention_7`    | 1 if the player logged in on the 7th day after installation, else 0.        |
+- 💡 Does moving the gate to level 40 improve player retention on Day 1 or Day 7?
+- 📉 How does the gate change affect overall gameplay behavior (e.g., number of rounds played)?
 
 ---
 
-## 🧠 Skills and Tools
+## 🧾 Dataset
 
-- **Pandas** for data loading, cleaning, and transformation.
-- **Seaborn & Matplotlib** for plotting distributions, bar plots, and retention trends.
-- **Statistical Testing** to compare retention rates and game rounds between groups:
-  - Two-sample t-tests
-  - Proportion z-tests
-- **Bootstrap Analysis** to estimate confidence intervals for retention differences.
+- **Source**: [Google Drive - Public CSV Download](https://drive.google.com/uc?id=1IkN-fylT9ZYxZJhzbgpAmJ751b6lrPy9)
+- **Size**: 90,189 observations, 5 columns
+- **Format**: CSV
 
 ---
 
-## 📈 Key Analyses
+## 📄 Sample Data
 
-1. **Exploratory Data Analysis (EDA):**
-   - Distribution of game rounds (`sum_gamerounds`)
-   - Retention rate differences (`retention_1`, `retention_7`)
-   - Group-wise summary statistics
-
-2. **Visualization:**
-   - Histogram of rounds played
-   - Bar plots for retention comparison
-
-3. **Statistical Testing:**
-   - Is the change from gate_30 to gate_40 statistically significant in improving day-1 or day-7 retention?
-   - How does it affect the number of rounds played?
-
-4. **Bootstrap (Optional Advanced):**
-   - Estimate 95% confidence intervals for retention rate differences using resampling.
+| userid | version | sum_gamerounds | retention_1 | retention_7 |
+|--------|---------|----------------|-------------|-------------|
+| 116    | gate_30 | 3              | False       | False       |
+| 337    | gate_30 | 38             | True        | False       |
+| 377    | gate_40 | 165            | True        | False       |
+| 483    | gate_40 | 1              | False       | False       |
+| 488    | gate_40 | 179            | True        | True        |
 
 ---
 
-## 🧪 Expected Insights
+## 📊 Group Summary Statistics
 
-- Does delaying the gate help keep players more engaged in the early stages?
-- Are players more likely to return after 1 or 7 days?
-- Is there a trade-off between increased gameplay and later frustration?
-
----
-
-## 🧰 Getting Started
-
-1. Install required packages:
-   ```
-   pip install pandas matplotlib seaborn scipy
-   ```
-
-2. Load and explore the data:
-   ```python
-   import pandas as pd
-   df = pd.read_csv("cookie_cats.csv")
-   ```
+| version  | count | median | mean   | std      | max   |
+|----------|-------|--------|--------|----------|--------|
+| gate_30  | 44700 | 17     | 52.46  | 256.72   | 49854 |
+| gate_40  | 45489 | 16     | 51.30  | 103.29   | 2640  |
 
 ---
 
-## 🧪 A Complete A/B Test Workflow
+## 🧼 Data Cleaning & Preprocessing
 
-A well-structured A/B test typically includes the following steps:
+### ⚠️ Key Challenges:
 
-1. **Analyze the Current Situation & Form Hypotheses**  
-   Investigate the current business situation, identify the highest priority improvement opportunities, form hypotheses, and propose optimization suggestions.
+1. **Extreme Outliers in Gameplay Rounds**
+2. **Zero-Engagement Users**
+3. **Highly Skewed Distributions**
 
-2. **Define Metrics**  
-   - **Primary Metrics** to evaluate the performance of different versions.
-   - **Secondary Metrics** to assess potential side effects or additional impact.
+### 🔍 Cleaning Strategy:
 
-3. **Design and Development**  
-   Design a prototype for the optimized version and implement the changes.
+| Step | Action Taken | Rationale |
+|------|--------------|-----------|
+| 1.   | Removed users with `sum_gamerounds == max()` | Outliers distorted averages. |
+| 2.   | Examined 1st–99th percentiles | Guided decision on thresholding. |
+| 3.   | Visualized before and after | Plotted histograms and boxplots. |
+| 4.   | Treated zero-round users selectively | Included for retention, excluded from gameplay plots. |
 
-4. **Determine Test Duration**  
-   Establish how long the A/B test will run to ensure sufficient data is collected.
+---
 
-5. **Define Traffic Allocation Strategy**  
-   Determine the percentage of users assigned to each group and other details of traffic splitting.
+## 🧪 Before Removing Extreme Values
 
-6. **Data Collection and Analysis**  
-   Collect experimental data and evaluate both the validity and effectiveness of the test.
+### 🔍 Raw Player Activity (Line Plot)
 
-7. **Draw Conclusions**  
-   Based on the results, decide whether to:
-   - Roll out the new version to all users.
-   - Adjust traffic split and continue testing.
-   - Redesign and iterate based on insights, returning to step 1.
+![Before Removing The Extreme Value](./before_extreme_line.png)
+
+- Each point represents a player's weekly game rounds.
+- A huge spike in `gate_30` shows one user with nearly 50,000 rounds.
+
+### 📊 Histogram & Boxplot View
+
+![Group Distributions Before Filtering](./before_extreme_hists.png)
+
+- **Left**: Histogram for `gate_30`
+- **Center**: Histogram for `gate_40`
+- **Right**: Boxplot comparison of both groups
+
+These visuals justified filtering outliers before applying statistical tests or comparing means.
+
+---
+
+## 🛠 Project Workflow
+
+1. **Load Data & Clean**
+2. **Visualize Engagement**
+3. **Compute Retention**
+4. **Run Tests (Shapiro, Levene, T-tests, Bootstrap)**
+5. **Draw Business Insights**
+
+---
+
+## 📈 Visualizations
+
+- Histograms, boxplots, ECDFs
+- Retention comparisons
+- Bootstrap distributions
+
+---
+
+## 💡 Key Insights
+
+- Moving the gate to level 40 **decreased retention** slightly.
+- Engagement remained similar across groups.
+- Retention metrics were **statistically different** via bootstrap & tests.
+
+---
+
+## 📬 Contact
+
+- 👤 Your Name
+- 📧 your.email@example.com
+- 🔗 [GitHub](https://github.com/yourname)
