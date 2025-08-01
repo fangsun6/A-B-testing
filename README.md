@@ -45,26 +45,79 @@ We use data from 90,000+ players to explore:
 
 ---
 
-## 🧼 Data Cleaning & Preprocessing
+## 🧼 Data Cleaning, Preprocessing & Visualizing Engagement
 
-### ⚠️ Key Challenges:
-
-1. **Extreme Outliers in Gameplay Rounds**
-2. **Zero-Engagement Users**
-3. **Highly Skewed Distributions**
-
-### 🔍 Cleaning Strategy:
-
-| Step | Action Taken | Rationale |
-|------|--------------|-----------|
-| 1.   | Removed users with `sum_gamerounds == max()` | Outliers distorted averages. |
-| 2.   | Examined 1st–99th percentiles | Guided decision on thresholding. |
-| 3.   | Visualized before and after | Plotted histograms and boxplots. |
-| 4.   | Treated zero-round users selectively | Included for retention, excluded from gameplay plots. |
+Understanding player behavior required a careful approach to both data preparation and exploratory visualization.
 
 ---
 
-![Uploading Unknown-3.png…]()
+### ⚠️ Key Data Challenges:
+
+1. **Extreme Outliers in Gameplay Rounds**  
+   Some players logged over 49,000 rounds in one week, severely distorting averages and plots.
+
+2. **Zero-Engagement Users**  
+   ~4.4% of users never played a round. Including them impacted retention metrics but not engagement analysis.
+
+3. **Skewed Distributions**  
+   Data was highly right-skewed, with most players playing <50 rounds but a few playing thousands.
+
+4. **Overplotting and Clutter**  
+   With 90k+ users, some line or scatter plots became unreadable.
+
+---
+
+### 🔍 Cleaning & Visualization Strategy:
+
+| Step | Action Taken | Rationale |
+|------|--------------|-----------|
+| 1.   | Removed users with `sum_gamerounds == max()` | Prevent single-user spikes from skewing all plots |
+| 2.   | Reviewed percentiles | Identified a realistic cap for “normal” users |
+| 3.   | Visualized before & after | Compared group histograms and boxplots pre/post-cleaning |
+| 4.   | Filtered zero-round users selectively | Included for retention, excluded for engagement comparisons |
+
+---
+
+### 📈 Visualization Techniques Used:
+
+- **Histograms & Boxplots**  
+  Revealed the shape and spread of player engagement.
+
+- **Density Plots & ECDFs**  
+  Used for comparing group-wide behavioral distributions.
+
+- **Stacked Bar Plots**  
+  Highlighted breakdowns in 1-day and 7-day retention.
+
+---
+
+### 🧠 What We Learned:
+
+- Most users engaged very lightly — outliers masked key trends.
+- Median values provided more useful comparisons than means.
+- Cleaning the data before visualization was critical for accurate, interpretable results.
+
+
+## 🧪 Before Removing Extreme Values
+
+### 🔍 Raw Player Activity (Line Plot)
+
+![Before Removing The Extreme Value](./before_extreme_line.png)
+
+- Each point represents a player's weekly game rounds.
+- A huge spike in `gate_30` shows one user with nearly 50,000 rounds.
+
+### 📊 Histogram & Boxplot View
+
+![Group Distributions Before Filtering](./before_extreme_hists.png)
+
+- **Left**: Histogram for `gate_30`
+- **Center**: Histogram for `gate_40`
+- **Right**: Boxplot comparison of both groups
+
+These visuals justified filtering outliers before applying statistical tests or comparing means.
+
+---
 
 
 ## 🛠 Project Workflow
